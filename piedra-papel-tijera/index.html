@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <title>Piedra, Papel o Tijera - Webinar con Vue</title>
+  </head>
+  <body>
+    <div id="game">
+      <div class="game-screen">
+        <div class="welcome" v-if="gameWelcome">
+          <h1 class="welcome__title">Bienvenido a Piedra, Papel o Tijeras</h1>
+          <button class="welcome__button" @click="gameWelcome = false">
+            Nuevo Juego
+          </button>
+        </div>
+        <div v-else class="game-canvas">
+            <h3 v-if="result"><span v-show="result != 'EMPATE'">Tú</span> {{ result }}</h3>
+            <p v-if="result">La computadora eligió {{ pcSelectName }}</p>
+            <p v-if="!result">Elige una de las opciones para jugar con el computador</p>
+          <div class="options">
+
+            <button
+              class="option__button"
+              v-for="(option, index) in gameOptions"
+              :key="option.value"
+              @click="playerSelection(index)"
+              :disabled="!isGameStarted"
+            >
+              <img
+                class="option__button-image"
+                :src="option.image"
+                :alt="option.name"
+              />
+            </button>
+          </div>
+          <button v-if="!isGameStarted" class="welcome__button" @click="gameStart">Iniciar juego</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      const { createApp, ref, reactive, computed } = Vue;
+      createApp({
+        setup() {
+          const gameWelcome = ref(true);
+          const gameOptions = reactive([
+            {
+              image: "./media/granite.svg",
+              name: "Piedra",
+              value: "piedra",
+            },
+            {
+              image: "./media/toilet-paper.svg",
+              name: "Papel",
+              value: "papel",
+            },
+            {
+              image: "./media/scissors.svg",
+              name: "Tijeras",
+              value: "tijeras",
+            },
+          ]);
+          const pcSelect = ref();
+          let playerSelect = reactive({});
+          const pcSelectName = computed(() => pcSelect.value?.name)
+          const isGameStarted = ref(false);
+          function gameStart() {
+            isGameStarted.value = true;
+            result.value = ""
+            playerSelect = null
+            pcSelect.value = gameOptions[Math.round(Math.random() * 2)];
+            console.log(pcSelect);
+            
+          }
+          function playerSelection(index) {
+            playerSelect = gameOptions[index];
+            getAnswers()
+          }
+          const result = ref("");
+          function getAnswers() {
+            console.log(pcSelect.value.value, playerSelect.value);
+            
+            if (pcSelect.value.value == playerSelect.value) {
+              result.value = "EMPATE";
+            } else {
+              switch (pcSelect.value.value) {
+                case "piedra":
+                  if (playerSelect.value == "tijeras") result.value = "PIERDES";
+                  if (playerSelect.value == "papel") result.value = "GANAS";
+                  break;
+                case "papel":
+                  if (playerSelect.value == "tijeras") result.value = "GANAS";
+                  if (playerSelect.value == "piedra") result.value = "PIERDES";
+                  break;
+                case "tijeras":
+                  if (playerSelect.value == "papel") result.value = "PIERDES";
+                  if (playerSelect.value == "piedra") result.value = "GANAS";
+                  break;
+              }
+            }
+            isGameStarted.value = false
+          }
+          return {
+            gameWelcome,
+            gameOptions,
+            gameStart,
+            result,
+            playerSelection,
+            isGameStarted,
+            pcSelect,
+            pcSelectName
+          };
+        },
+      }).mount("#game");
+    </script>
+    <style>
+      .game-screen {
+        width: 500px;
+        height: 400px;
+        background-image: url("media/marco2.jpg");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+      }
+      .welcome {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-flow: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .welcome__title {
+        color: white;
+        font-size: 2rem;
+        margin: 1rem auto;
+        padding: 8px;
+        text-align: center;
+      }
+      .welcome__button {
+        border-radius: 10px;
+        padding: 4px 8px;
+        background-color: blueviolet;
+        color: aliceblue;
+        font-weight: bold;
+        border: thin solid transparent;
+        box-shadow: 2px 5px 4px 0px violet;
+        transition: all 500ms;
+      }
+      .welcome__button:hover {
+        background-color: aliceblue;
+        color: blueviolet;
+      }
+      .welcome__button:active {
+        box-shadow: unset;
+        color: white;
+      }
+      .game-canvas {
+        padding: 1rem;
+        height: 100%;
+        display: flex;
+        flex-flow: column;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+      }
+      .options {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+      }
+      .option__button {
+        width: 80px;
+        height: 80px;
+      }
+      .option__button-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+      }
+    </style>
+  </body>
+</html>

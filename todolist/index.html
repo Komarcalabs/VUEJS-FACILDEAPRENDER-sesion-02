@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <title>Sesión 2 - Webinar con Vue</title>
+</head>
+<body>
+    <div id="app">
+        <!-- Ingreso de datos -->
+        <div>
+            <input type="text" v-model="entradaTarea" placeholder="Ingresa una Tarea">
+            <button v-on:click="agregarTarea">Agregar</button>
+        </div>
+        <!-- Lista de tareas -->
+        <!-- v-if/v-else o v-show -->
+        <p v-if="tareasHechas > 0">{{tareasHechas}} han sido realizadas</p>
+        <div>
+            <ul>
+                <li v-for="(tarea, index) of tareas" v-bind:key="index">
+                    <span>{{tarea}}</span> <button @click="removerTarea(index)">Listo</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        const { createApp, ref } = Vue;
+        createApp({
+            setup(){
+                const entradaTarea = ref("");
+                const tareas = ref([]);
+                const tareasHechas = ref (0);
+                function agregarTarea(){
+                    tareas.value.push(entradaTarea.value);
+                    entradaTarea.value = "";
+                }
+                function removerTarea(index){
+                    tareasHechas.value += 1;
+                    tareas.value.splice(index,1);
+                }
+                return {
+                    entradaTarea,
+                    tareas,
+                    tareasHechas, 
+                    agregarTarea,
+                    removerTarea
+                }
+            }
+        }).mount("#app")
+    </script>
+</body>
+</html>
